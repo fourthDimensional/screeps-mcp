@@ -1,7 +1,7 @@
-import { client } from '../client.js';
+import { transport } from '../transport/screeps-transport.js';
 
 export async function getUserInfo() {
-  const response = await client.get('/api/auth/me');
+  const response = await transport.get('/api/auth/me');
   const data = response.data;
 
   return {

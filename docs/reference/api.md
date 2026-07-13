@@ -34,7 +34,8 @@ The default targets a local private server. Set `SCREEPS_SERVER` to override it,
 
 | Endpoint | Method | Tool | Notes |
 |----------|--------|------|-------|
-| `/api/user/code` | POST | `upload_code` | Upload code modules |
+| `/api/user/code` | GET/POST | `get_code_modules`, `upload_modules` | Read/write a complete module manifest |
+| `/api/user/set-active-branch` | POST | `activate_branch` | Policy-gated; capability-dependent on private servers |
 | `/api/user/console` | GET | `get_console` | Returns 404; use WebSocket |
 | `/api/user/console` | POST | `execute_command` | Requires active bot |
 | `/api/user/memory` | GET | `get_memory` | Returns empty if bot never ran |
@@ -44,7 +45,23 @@ The default targets a local private server. Set `SCREEPS_SERVER` to override it,
 | `/api/game/time` | GET | `get_game_time` | Requires valid shard |
 | `/api/auth/me` | GET | `get_user_info` | Always works |
 
-## Composite Tools
+## Harness tools
+
+All tools return `{ ok, code, message, data }`; see [Tool Results](tool-results.md). `upload_modules` accepts a complete manifest with `entryModule`, `modules`, and an optional content hash. `deploy_and_verify` persists a deployment record before upload, captures an observation, and returns `healthy`, `unhealthy`, or `inconclusive` verification without activating a branch.
+
+`run_probe`, `get_empire_snapshot`, and `get_room_snapshot` wait for a correlated console result. A successful `POST /api/user/console` acknowledgement only proves that a command was issued; it is never treated as live game data.
+
+| Tool group | Tools | Result data |
+| --- | --- | --- |
+| Policy and audit | `get_policy`, `get_audit_log` | Effective permissions and redacted append-only events. |
+| Deployment records | `get_deployment`, `list_deployments`, `rollback_deployment` | Branch, shard, hashes, baseline, ticks, status, and verification. |
+| Code lifecycle | `list_branches`, `get_active_branch`, `list_code_modules`, `get_code_modules`, `validate_modules`, `upload_modules`, `activate_branch`, `deploy_and_verify` | Complete manifests, validation errors, and remote payload under `rawServerData`. |
+| Observation | `get_console`, `run_probe`, `get_empire_snapshot`, `get_room_snapshot` | Cursor records or tick-correlated structured snapshots with freshness. |
+| Evidence | `get_telemetry`, `record_snapshot`, `get_metrics`, `compare_deployments`, `evaluate_health` | Optional telemetry, local samples, summary statistics, and a three-state verdict. |
+
+`upload_modules`, `activate_branch`, `rollback_deployment`, raw `execute_command`, and `set_memory` are audited mutations. In production they require the matching value in `SCREEPS_APPROVED_OPERATIONS`. Console records cap reads at 200; HTTP responses cap at 1 MiB; idempotent reads retry once.
+
+## Compatibility tools
 
 These tools execute JavaScript in the Screeps console via `execute_command`.
 
@@ -71,19 +88,7 @@ JSON.stringify({
 
 ### `get_room_objects`
 
-```javascript
-JSON.stringify({
-  structures: Object.keys(Game.rooms['ROOM'].find(FIND_STRUCTURES) || []).length,
-  creeps: Object.keys(Game.rooms['ROOM'].find(FIND_MY_CREEPS) || []).length,
-  hostiles: Object.keys(Game.rooms['ROOM'].find(FIND_HOSTILE_CREEPS) || []).length,
-  energy: Game.rooms['ROOM']?.energyAvailable,
-  controller: {
-    level: Game.rooms['ROOM']?.controller?.level,
-    progress: Game.rooms['ROOM']?.controller?.progress,
-    progressTotal: Game.rooms['ROOM']?.controller?.progressTotal,
-  },
-});
-```
+This is now a compatibility alias for the tick-correlated `room_objects` probe. Room names are validated and serialized as data; they are never interpolated into console JavaScript.
 
 ### `check_for_errors`
 
@@ -94,7 +99,8 @@ Scans `get_console` logs for entries containing `error`, `exception`, or `undefi
 - **Console logs**: the Screeps HTTP GET endpoint returns 404. The MCP uses a WebSocket connection for real-time logs when `SCREEPS_TOKEN` is provided.
 - **Console commands**: require an active bot running in-game. Results appear in subsequent console logs.
 - **Game time**: requires a valid shard such as `shard0`.
-- **Code upload**: currently supports a single `main` module.
+- **Branch read APIs and private-server WebSockets**: treated as capability-dependent; see [Compatibility](compatibility.md).
+- **Telemetry**: optional and bot-provided; see [Telemetry Contract](telemetry-contract.md).
 
 ## Rate Limits
 

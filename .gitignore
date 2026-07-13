@@ -37,6 +37,9 @@ build/
 .eslintcache
 .prettiercache
 
+# Local harness state (may contain operational history)
+.screeps-mcp/
+
 # Local tool directories
 .claude/
 .cursor/

@@ -1,4 +1,5 @@
 import { executeConsoleCommand } from './execute-command.js';
+import { classifyErrors } from '../errors.js';
 
 export async function analyzePerformance() {
   const command = `JSON.stringify({
@@ -35,15 +36,11 @@ export async function checkForErrors() {
     };
   }
 
-  const errors = consoleLogs.logs.filter((log) => {
-    const logText = typeof log === 'string' ? log : JSON.stringify(log);
-    const lower = logText.toLowerCase();
-    return lower.includes('error') || lower.includes('exception') || lower.includes('undefined');
-  });
+  const errors = classifyErrors(consoleLogs.logs, { tick: consoleLogs.tick });
 
   return {
     hasErrors: errors.length > 0,
-    errorCount: errors.length,
+    errorCount: errors.reduce((count, error) => count + error.count, 0),
     errors,
     allLogs: consoleLogs.logs,
   };

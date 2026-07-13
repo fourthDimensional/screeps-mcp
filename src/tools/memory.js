@@ -1,8 +1,8 @@
-import { client } from '../client.js';
+import { transport } from '../transport/screeps-transport.js';
 
 export async function getMemory(path = '') {
   const url = path ? `/api/user/memory?path=${encodeURIComponent(path)}` : '/api/user/memory';
-  const response = await client.get(url);
+  const response = await transport.get(url);
 
   return {
     data: response.data.data ? JSON.parse(response.data.data) : null,
@@ -11,7 +11,7 @@ export async function getMemory(path = '') {
 }
 
 export async function setMemory(path, value) {
-  const response = await client.post('/api/user/memory', {
+  const response = await transport.post('/api/user/memory', {
     path,
     value: JSON.stringify(value),
   });

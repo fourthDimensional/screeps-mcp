@@ -1,8 +1,8 @@
-import { client } from '../client.js';
+import { transport } from '../transport/screeps-transport.js';
 
 export async function getGameTime(shard = 'shard0') {
   try {
-    const response = await client.get(`/api/game/time?shard=${shard}`);
+    const response = await transport.get(`/api/game/time?shard=${encodeURIComponent(shard)}`);
 
     return {
       time: response.data.time,
@@ -10,7 +10,7 @@ export async function getGameTime(shard = 'shard0') {
       shard,
     };
   } catch (error) {
-    if (error.response?.data?.error === 'invalid shard') {
+    if (error.details?.cause?.includes('invalid shard')) {
       return {
         error: 'Game time requires a valid shard name. Try "shard0", "shard1", or "shard2".',
         note: 'You may need an active game session to get game time.',

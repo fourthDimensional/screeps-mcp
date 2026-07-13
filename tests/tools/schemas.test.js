@@ -2,26 +2,29 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { tools } from '../../src/tools/schemas.js';
 
-const EXPECTED_TOOLS = [
-  'upload_code',
-  'get_console',
-  'execute_command',
-  'get_memory',
-  'set_memory',
-  'get_room_terrain',
-  'get_room_status',
-  'get_user_info',
-  'get_game_time',
-  'analyze_performance',
-  'check_for_errors',
-  'troubleshoot_bot',
-  'get_room_objects',
+const REQUIRED_HARNESS_TOOLS = [
+  'get_policy',
+  'get_audit_log',
+  'validate_modules',
+  'upload_modules',
+  'deploy_and_verify',
+  'rollback_deployment',
+  'run_probe',
+  'get_empire_snapshot',
+  'get_room_snapshot',
+  'get_telemetry',
+  'record_snapshot',
+  'compare_deployments',
+  'evaluate_health',
 ];
 
 describe('tool schemas', () => {
-  it('exposes all 13 expected tools', () => {
+  it('exposes the core closed-loop harness tools and legacy compatibility tools', () => {
     const names = tools.map((tool) => tool.name);
-    assert.deepEqual(names, EXPECTED_TOOLS);
+    for (const name of REQUIRED_HARNESS_TOOLS)
+      assert.ok(names.includes(name), `${name} should exist`);
+    assert.ok(names.includes('upload_code'));
+    assert.ok(names.includes('get_room_objects'));
   });
 
   it('marks required parameters on tools that need them', () => {

@@ -1,13 +1,17 @@
-import { client } from '../client.js';
+import { transport } from '../transport/screeps-transport.js';
 
 export async function getRoomTerrain(roomName, encoded = false, shard = 'shard0') {
-  const url = `/api/game/room-terrain?room=${roomName}&shard=${shard}${encoded ? '&encoded=1' : ''}`;
-  const response = await client.get(url);
+  const params = new URLSearchParams({ room: roomName, shard });
+  if (encoded) params.set('encoded', '1');
+  const url = `/api/game/room-terrain?${params}`;
+  const response = await transport.get(url);
   return response.data;
 }
 
 export async function getRoomStatus(roomName, shard = 'shard0') {
-  const response = await client.get(`/api/game/room-status?room=${roomName}&shard=${shard}`);
+  const response = await transport.get(
+    `/api/game/room-status?${new URLSearchParams({ room: roomName, shard })}`
+  );
   return response.data;
 }
 

@@ -16,10 +16,10 @@ src/
 
 ## Adding a New Tool
 
-1. Implement the handler in `src/tools/<category>.js`.
+1. Implement the public handler in `src/tools/<category>.js`, or keep its thin registration in `src/tools/dispatch.js` and put reusable domain/transport logic in `src/`.
 2. Add the JSON schema to `src/tools/schemas.js`.
 3. Register the handler in `src/tools/dispatch.js`.
-4. Add a test in `tests/tools/` if applicable.
+4. Add a test in `tests/tools/` for public tool contracts; pure domain and transport units may live directly in `tests/`.
 5. Document the tool in `docs/reference/api.md`.
 
 ## Code Style

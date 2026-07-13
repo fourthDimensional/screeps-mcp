@@ -1,8 +1,8 @@
-import { client } from '../client.js';
+import { transport } from '../transport/screeps-transport.js';
 
 export async function executeConsoleCommand(command) {
   try {
-    const response = await client.post('/api/user/console', {
+    const response = await transport.post('/api/user/console', {
       expression: command,
     });
 

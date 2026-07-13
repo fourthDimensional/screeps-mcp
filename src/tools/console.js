@@ -1,4 +1,4 @@
-import { client } from '../client.js';
+import { transport } from '../transport/screeps-transport.js';
 import { getBuffer, getConnectionStatus } from '../websocket/index.js';
 
 let wsInitialized = false;
@@ -11,15 +11,17 @@ export function isWebSocketInitialized() {
   return wsInitialized;
 }
 
-export async function getConsole() {
+export async function getConsole({ afterCursor = 0, limit = 100, levels } = {}) {
   if (wsInitialized) {
     try {
-      const buffer = getBuffer();
+      const buffer = getBuffer({ afterCursor, limit, levels });
       const status = getConnectionStatus();
 
       return {
         logs: buffer.logs,
         results: buffer.results,
+        records: buffer.records,
+        nextCursor: buffer.nextCursor,
         count: buffer.count,
         error: null,
         available: true,
@@ -33,17 +35,19 @@ export async function getConsole() {
   }
 
   try {
-    const response = await client.get('/api/user/console');
+    const response = await transport.get('/api/user/console');
 
     return {
-      logs: response.data.log || response.data.logs || [],
-      results: response.data.results || [],
+      logs: (response.data.log || response.data.logs || []).slice(-limit),
+      results: (response.data.results || []).slice(-limit),
+      records: [],
+      nextCursor: afterCursor,
       error: response.data.error || null,
       available: true,
       source: 'http',
     };
   } catch (error) {
-    if (error.response && error.response.status === 404) {
+    if (error.code === 'feature_unavailable') {
       return {
         logs: [],
         results: [],

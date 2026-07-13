@@ -1,4 +1,4 @@
-import { SCREEPS_BRANCH } from '../config.js';
+import { SCREEPS_BRANCH, SCREEPS_SHARD } from '../config.js';
 
 const object = (name, description, properties = {}, required = []) => ({
   name,
@@ -63,7 +63,7 @@ export const tools = [
     {
       manifest: { type: 'object' },
       branch,
-      shard: string('Target shard.', { default: 'shard0' }),
+      shard: string('Target shard.', { default: SCREEPS_SHARD }),
       verificationTicks: { type: 'integer', minimum: 1, maximum: 30, default: 5 },
     },
     ['manifest']
@@ -81,7 +81,10 @@ export const tools = [
   object(
     'execute_command',
     'Issue raw JavaScript in the Screeps console. Safety: advanced and audited.',
-    { command: string('JavaScript console expression.') },
+    {
+      command: string('JavaScript console expression.'),
+      shard: string('Target shard.', { default: SCREEPS_SHARD }),
+    },
     ['command']
   ),
   object('get_memory', 'Read bot Memory; advanced recovery surface.', {
@@ -99,18 +102,20 @@ export const tools = [
     {
       roomName,
       encoded: { type: 'boolean', default: false },
-      shard: string('Shard.', { default: 'shard0' }),
+      shard: string('Shard.', { default: SCREEPS_SHARD }),
     },
     ['roomName']
   ),
   object(
     'get_room_status',
     'Read ownership and reservation status.',
-    { roomName, shard: string('Shard.', { default: 'shard0' }) },
+    { roomName, shard: string('Shard.', { default: SCREEPS_SHARD }) },
     ['roomName']
   ),
   object('get_user_info', 'Read current account information.'),
-  object('get_game_time', 'Read current tick.', { shard: string('Shard.', { default: 'shard0' }) }),
+  object('get_game_time', 'Read current tick.', {
+    shard: string('Shard.', { default: SCREEPS_SHARD }),
+  }),
   object(
     'run_probe',
     'Run a named, tick-correlated structured probe.',

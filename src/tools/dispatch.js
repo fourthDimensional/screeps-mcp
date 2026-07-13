@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';
-import { SCREEPS_BRANCH } from '../config.js';
+import { SCREEPS_BRANCH, SCREEPS_SHARD } from '../config.js';
 import { auditStore } from '../audit.js';
 import { deploymentStore } from '../deployments.js';
 import { evaluateHealth } from '../health.js';
@@ -71,7 +71,7 @@ function parseMemoryValue(value) {
 async function deployAndVerify({
   manifest,
   branch = SCREEPS_BRANCH,
-  shard = 'shard0',
+  shard = SCREEPS_SHARD,
   verificationTicks = 5,
 }) {
   const validation = validateManifest(manifest);
@@ -207,17 +207,19 @@ const handlers = {
     return getConsole(args);
   },
   execute_command: (args) =>
-    mutation('raw_console', args, { console: true }, () => executeConsoleCommand(args.command)),
+    mutation('raw_console', args, { console: true }, () =>
+      executeConsoleCommand(args.command, args.shard)
+    ),
   get_memory: ({ path = '' }) => getMemory(path),
   set_memory: (args) =>
     mutation('memory_write', args, { path: args.path }, () =>
       setMemory(args.path, parseMemoryValue(args.value))
     ),
-  get_room_terrain: ({ roomName, encoded, shard = 'shard0' }) =>
+  get_room_terrain: ({ roomName, encoded, shard = SCREEPS_SHARD }) =>
     getRoomTerrain(roomName, encoded, shard),
-  get_room_status: ({ roomName, shard = 'shard0' }) => getRoomStatus(roomName, shard),
+  get_room_status: ({ roomName, shard = SCREEPS_SHARD }) => getRoomStatus(roomName, shard),
   get_user_info: getUserInfo,
-  get_game_time: ({ shard = 'shard0' }) => getGameTime(shard),
+  get_game_time: ({ shard = SCREEPS_SHARD }) => getGameTime(shard),
   run_probe: runProbe,
   get_empire_snapshot: getEmpireSnapshot,
   get_room_snapshot: getRoomSnapshot,

@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { tools } from '../../src/tools/schemas.js';
+import { SCREEPS_SHARD } from '../../src/config.js';
 
 const REQUIRED_HARNESS_TOOLS = [
   'get_policy',
@@ -49,8 +50,8 @@ describe('tool schemas', () => {
     const roomStatus = tools.find((t) => t.name === 'get_room_status');
     const gameTime = tools.find((t) => t.name === 'get_game_time');
 
-    assert.equal(roomTerrain.inputSchema.properties.shard.default, 'shard0');
-    assert.equal(roomStatus.inputSchema.properties.shard.default, 'shard0');
-    assert.equal(gameTime.inputSchema.properties.shard.default, 'shard0');
+    assert.equal(roomTerrain.inputSchema.properties.shard.default, SCREEPS_SHARD);
+    assert.equal(roomStatus.inputSchema.properties.shard.default, SCREEPS_SHARD);
+    assert.equal(gameTime.inputSchema.properties.shard.default, SCREEPS_SHARD);
   });
 });

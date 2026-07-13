@@ -8,6 +8,8 @@ const SCREEPS_EMAIL = process.env.SCREEPS_EMAIL || '';
 const SCREEPS_PASSWORD = process.env.SCREEPS_PASSWORD || '';
 const SCREEPS_SERVER = process.env.SCREEPS_SERVER || 'http://localhost:21025';
 const SCREEPS_BRANCH = process.env.SCREEPS_BRANCH || 'default';
+const SCREEPS_SHARD = process.env.SCREEPS_SHARD || 'shard0';
+const SCREEPS_TICK_DURATION_MS = Number(process.env.SCREEPS_TICK_DURATION_MS || 5000);
 const SCREEPS_ENVIRONMENT = process.env.SCREEPS_ENVIRONMENT || 'development';
 const SCREEPS_AUDIT_PATH = process.env.SCREEPS_AUDIT_PATH || '.screeps-mcp/audit.jsonl';
 const SCREEPS_DEPLOYMENTS_PATH =
@@ -17,6 +19,9 @@ const SCREEPS_SESSION_LABEL = process.env.SCREEPS_SESSION_LABEL || 'mcp';
 
 if (!['development', 'staging', 'production'].includes(SCREEPS_ENVIRONMENT)) {
   throw new Error('SCREEPS_ENVIRONMENT must be development, staging, or production.');
+}
+if (!Number.isInteger(SCREEPS_TICK_DURATION_MS) || SCREEPS_TICK_DURATION_MS < 250) {
+  throw new Error('SCREEPS_TICK_DURATION_MS must be an integer of at least 250.');
 }
 
 export function getPolicyConfig() {
@@ -62,6 +67,8 @@ export {
   SCREEPS_PASSWORD,
   SCREEPS_SERVER,
   SCREEPS_BRANCH,
+  SCREEPS_SHARD,
+  SCREEPS_TICK_DURATION_MS,
   SCREEPS_ENVIRONMENT,
   SCREEPS_AUDIT_PATH,
   SCREEPS_DEPLOYMENTS_PATH,

@@ -1,6 +1,7 @@
 import { transport } from '../transport/screeps-transport.js';
+import { SCREEPS_SHARD } from '../config.js';
 
-export async function getGameTime(shard = 'shard0') {
+export async function getGameTime(shard = SCREEPS_SHARD) {
   try {
     const response = await transport.get(`/api/game/time?shard=${encodeURIComponent(shard)}`);
 

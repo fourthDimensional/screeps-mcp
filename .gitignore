@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-package-lock.json
+.pnpm-store/
 
 # Environment variables
 .env
@@ -33,4 +33,10 @@ coverage/
 dist/
 build/
 
+# Tool caches
+.eslintcache
+.prettiercache
 
+# Local tool directories
+.claude/
+.cursor/

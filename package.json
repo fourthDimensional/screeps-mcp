@@ -1,16 +1,28 @@
 {
   "name": "screeps-mcp",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Model Context Protocol server for Screeps - upload code, monitor console, troubleshoot bots",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "bin": {
-    "screeps-mcp": "./index.js"
+    "screeps-mcp": "src/index.js"
   },
+  "files": [
+    "src/",
+    "scripts/",
+    "README.md",
+    "CHANGELOG.md",
+    ".env.example"
+  ],
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
-    "test": "node test-connection.js"
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test tests/**/*.test.js",
+    "smoke": "node scripts/smoke-test.js",
+    "lint": "eslint src/ scripts/ tests/",
+    "lint:fix": "eslint src/ scripts/ tests/ --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [
     "screeps",
@@ -19,7 +31,7 @@
     "bot",
     "automation"
   ],
-  "author": "",
+  "author": "Sam B <bargallosam@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0",
@@ -27,7 +39,14 @@
     "dotenv": "^16.0.0",
     "screeps-api": "^1.16.1"
   },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
+    "prettier": "^3.0.0"
+  },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "packageManager": "pnpm@11.5.0"
 }

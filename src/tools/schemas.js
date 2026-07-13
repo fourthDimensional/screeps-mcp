@@ -24,7 +24,6 @@ export const tools = [
     limit: { type: 'integer', minimum: 1, maximum: 500 },
   }),
   object('list_branches', 'List remotely available code branches. Freshness: request-time.'),
-  object('get_active_branch', 'Read the active code branch. Freshness: request-time.'),
   object('list_code_modules', 'List module names on a branch.', { branch }),
   object('get_code_modules', 'Read complete code modules from a branch.', { branch }, ['branch']),
   object(

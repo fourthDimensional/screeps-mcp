@@ -6,7 +6,7 @@ The official Screeps Web API is intentionally undocumented in general, so the ha
 | --- | --- | --- | --- |
 | Read/write complete modules (`GET`/`POST /api/user/code`) | Confirmed | Expected; verify per version | Supported |
 | Activate branch (`POST /api/user/set-active-branch`) | Confirmed | Version-dependent | Policy-gated; returns capability error if absent |
-| Branch list / active branch read | Not documented as stable | Version-dependent | Capability-dependent |
+| Branch list | Supported by the configured account | Version-dependent | Read branches explicitly; no active-branch read is modeled |
 | Console command (`POST /api/user/console`) | Rate-limited endpoint | Version-dependent | Supported; acknowledgement is not data |
 | WebSocket console | Token-scoped | Version-dependent | Optional; probes become unavailable without it |
 | Market endpoints | Token-scoped endpoints exist | Often disabled | Not exposed as actions in this release |

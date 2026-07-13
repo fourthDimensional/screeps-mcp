@@ -35,7 +35,7 @@ The default targets a local private server. Set `SCREEPS_SERVER` to override it,
 | Endpoint | Method | Tool | Notes |
 |----------|--------|------|-------|
 | `/api/user/code` | GET/POST | `get_code_modules`, `upload_modules` | Read/write a complete module manifest |
-| `/api/user/set-active-branch` | POST | `activate_branch` | Policy-gated; capability-dependent on private servers |
+| `/api/user/set-active-branch` | POST | `activate_branch` | Policy-gated; no corresponding active-branch read tool |
 | `/api/user/console` | GET | `get_console` | Returns 404; use WebSocket |
 | `/api/user/console` | POST | `execute_command` | Requires active bot |
 | `/api/user/memory` | GET | `get_memory` | Returns empty if bot never ran |
@@ -55,7 +55,7 @@ All tools return `{ ok, code, message, data }`; see [Tool Results](tool-results.
 | --- | --- | --- |
 | Policy and audit | `get_policy`, `get_audit_log` | Effective permissions and redacted append-only events. |
 | Deployment records | `get_deployment`, `list_deployments`, `rollback_deployment` | Branch, shard, hashes, baseline, ticks, status, and verification. |
-| Code lifecycle | `list_branches`, `get_active_branch`, `list_code_modules`, `get_code_modules`, `validate_modules`, `upload_modules`, `activate_branch`, `deploy_and_verify` | Complete manifests, validation errors, and remote payload under `rawServerData`. |
+| Code lifecycle | `list_branches`, `list_code_modules`, `get_code_modules`, `validate_modules`, `upload_modules`, `activate_branch`, `deploy_and_verify` | Complete manifests, validation errors, and remote payload under `rawServerData`. |
 | Observation | `get_console`, `run_probe`, `get_empire_snapshot`, `get_room_snapshot` | Cursor records or tick-correlated structured snapshots with freshness. |
 | Evidence | `get_telemetry`, `record_snapshot`, `get_metrics`, `compare_deployments`, `evaluate_health` | Optional telemetry, local samples, summary statistics, and a three-state verdict. |
 

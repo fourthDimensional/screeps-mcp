@@ -1,6 +1,6 @@
 # Agent harness playbook
 
-1. Call `get_policy`, `get_active_branch`, `get_empire_snapshot`, and `get_telemetry`. Treat absent telemetry as reduced insight, not failure.
+1. Call `get_policy`, `list_branches`, `get_empire_snapshot`, and `get_telemetry`. Fetch the intended branch explicitly (`default` for the main world); do not infer a globally active branch. Treat absent telemetry as reduced insight, not failure.
 2. Retrieve every module with `get_code_modules`, make a complete manifest, then call `validate_modules`.
 3. Use `deploy_and_verify` on the intended branch. It records the manifest hash and baseline but never activates a branch implicitly.
 4. Call `record_snapshot` over several ticks, then `compare_deployments` and `evaluate_health`. An `inconclusive` verdict asks for more observations; it is not a healthy result.

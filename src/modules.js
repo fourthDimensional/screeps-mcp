@@ -80,13 +80,6 @@ export async function listBranches() {
     rawServerData: response.data,
   });
 }
-export async function getActiveBranch() {
-  const response = await transport.get('/api/user/active-branch');
-  return ok({
-    branch: response.data.active || response.data.branch || response.data,
-    rawServerData: response.data,
-  });
-}
 export async function listCodeModules(branch = SCREEPS_BRANCH) {
   validateBranch(branch);
   const response = await transport.get(`/api/user/code?branch=${encodeURIComponent(branch)}`);

@@ -6,7 +6,6 @@ import { evaluateHealth } from '../health.js';
 import { compareDeployments, getMetrics, metricsStore } from '../metrics.js';
 import {
   activateBranch,
-  getActiveBranch,
   getCodeModules,
   listBranches,
   listCodeModules,
@@ -181,7 +180,6 @@ const handlers = {
   },
   list_deployments: async (args) => ok({ deployments: await deploymentStore.list(args) }),
   list_branches: listBranches,
-  get_active_branch: getActiveBranch,
   list_code_modules: ({ branch = SCREEPS_BRANCH }) => listCodeModules(branch),
   get_code_modules: ({ branch = SCREEPS_BRANCH }) => getCodeModules(branch),
   validate_modules: ({ manifest }) => {

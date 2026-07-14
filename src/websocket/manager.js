@@ -5,6 +5,20 @@ let api = null;
 let connectionStatus = 'disconnected';
 let subscriptionStatus = 'unsubscribed';
 
+function values(value) {
+  if (value === undefined || value === null) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+export function consoleEntriesFromEvent(event) {
+  const data = event?.data || {};
+  const messages = data.messages || {};
+  return {
+    logs: [...values(messages.log), ...values(messages.error), ...values(data.error)],
+    results: values(messages.results),
+  };
+}
+
 function parseServerUrl(server) {
   const serverUrl = new URL(server);
   const protocol = serverUrl.protocol.replace(':', '');
@@ -39,11 +53,9 @@ export async function initWebSocket(token, server = 'http://localhost:21025') {
     await api.socket.connect();
     await api.socket.subscribe('console', (event) => {
       try {
-        const { messages } = event.data;
-        if (messages) {
-          pushLogs(messages.log);
-          pushResults(messages.results);
-        }
+        const { logs, results } = consoleEntriesFromEvent(event);
+        pushLogs(logs);
+        pushResults(results);
       } catch (error) {
         console.error('Error processing console message:', error);
       }

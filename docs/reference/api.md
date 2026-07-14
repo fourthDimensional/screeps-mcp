@@ -59,6 +59,8 @@ All tools return `{ ok, code, message, data }`; see [Tool Results](tool-results.
 | Observation | `get_console`, `run_probe`, `get_empire_snapshot`, `get_room_snapshot` | Cursor records or tick-correlated structured snapshots with freshness. |
 | Evidence | `get_telemetry`, `record_snapshot`, `get_metrics`, `compare_deployments`, `evaluate_health` | Optional telemetry, local samples, summary statistics, and a three-state verdict. |
 
+`get_room_snapshot` accepts a `detail` selector. The `structures` detail returns each visible built structure (type, location, durability, and store where relevant), each visible construction site (structure type, location, and build progress), and complete per-type totals. Both item arrays are capped at 2,500 entries and report truncation separately; totals always cover the whole visible room.
+
 `validate_files`, `upload_files`, and `deploy_files_and_verify` build a complete manifest from a JavaScript file or a directory tree. Directory files become module names relative to that directory (`roles/harvester.js` becomes `roles/harvester`); `main.js` is the default entry module. All file tools only read under `SCREEPS_SOURCE_ROOT` (the process working directory unless configured). A verified deployment records its source path, module count, readback hash evidence, and distinct observed ticks. `upload_files`, `upload_modules`, `deploy_files_and_verify`, `activate_branch`, `rollback_deployment`, raw `execute_command`, and `set_memory` are audited mutations. In production they require the matching value in `SCREEPS_APPROVED_OPERATIONS`. Console records cap reads at 200; HTTP responses cap at 1 MiB; idempotent reads retry once.
 
 ## Compatibility tools

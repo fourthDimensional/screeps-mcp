@@ -161,7 +161,7 @@ export const tools = [
   object('get_empire_snapshot', 'Get a compact, tick-correlated empire health snapshot.'),
   object(
     'get_room_snapshot',
-    'Get a bounded room snapshot.',
+    'Get a bounded room snapshot; structures detail includes built structures and construction sites.',
     {
       roomName,
       detail: string('summary, economy, structures, creeps, threats, or planning.', {

@@ -28,4 +28,17 @@ describe('probe expressions', () => {
     assert.match(creeps, /ticksToLive/);
     assert.notEqual(structures, creeps);
   });
+
+  it('includes construction sites and type totals in structures snapshots', () => {
+    const expression = createProbeExpression(
+      'room_snapshot',
+      { roomName: 'W1N1', detail: 'structures' },
+      'probe-id'
+    );
+
+    assert.match(expression, /FIND_CONSTRUCTION_SITES/);
+    assert.match(expression, /progressTotal/);
+    assert.match(expression, /constructionSites/);
+    assert.match(expression, /totals/);
+  });
 });

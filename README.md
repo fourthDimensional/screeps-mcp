@@ -9,6 +9,7 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for [S
 - **Command execution**: run JavaScript in the Screeps console.
 - **Memory management**: read and write bot memory paths.
 - **Game state access**: room terrain, room status, game time, user info.
+- **Documentation search**: full-text BM25 search over the Screeps guide, API reference, and game constants.
 - **Evidence-driven diagnostics**: tick-correlated probes, compact snapshots, optional telemetry, local metric history, and explicit health verdicts.
 - **Safety controls**: environment policy, structured results, and append-only audit records for mutations.
 

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Documentation search tools: `screeps_search`, `screeps_read_section`, and `screeps_read_page`.
+- `better-sqlite3` dependency and `npm run build:docs-index` script to build the docs index from the upstream Screeps docs repo.
+
 ## [1.1.1] - 2026-07-13
 
 ### Changed

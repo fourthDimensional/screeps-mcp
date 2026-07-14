@@ -1,7 +1,12 @@
 import dotenv from 'dotenv';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Load .env from project root if it exists
 dotenv.config();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(__dirname, '..');
 
 const SCREEPS_TOKEN = process.env.SCREEPS_TOKEN || '';
 const SCREEPS_EMAIL = process.env.SCREEPS_EMAIL || '';
@@ -16,6 +21,9 @@ const SCREEPS_DEPLOYMENTS_PATH =
   process.env.SCREEPS_DEPLOYMENTS_PATH || '.screeps-mcp/deployments.json';
 const SCREEPS_METRICS_PATH = process.env.SCREEPS_METRICS_PATH || '.screeps-mcp/metrics.json';
 const SCREEPS_SESSION_LABEL = process.env.SCREEPS_SESSION_LABEL || 'mcp';
+const SCREEPS_DOCS_DB = process.env.SCREEPS_DOCS_DB
+  ? path.resolve(projectRoot, process.env.SCREEPS_DOCS_DB)
+  : path.join(projectRoot, 'data', 'screeps_docs.db');
 
 if (!['development', 'staging', 'production'].includes(SCREEPS_ENVIRONMENT)) {
   throw new Error('SCREEPS_ENVIRONMENT must be development, staging, or production.');
@@ -74,4 +82,5 @@ export {
   SCREEPS_DEPLOYMENTS_PATH,
   SCREEPS_METRICS_PATH,
   SCREEPS_SESSION_LABEL,
+  SCREEPS_DOCS_DB,
 };

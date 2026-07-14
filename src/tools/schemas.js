@@ -6,6 +6,7 @@ const object = (name, description, properties = {}, required = []) => ({
   inputSchema: { type: 'object', properties, ...(required.length ? { required } : {}) },
 });
 const string = (description, extra = {}) => ({ type: 'string', description, ...extra });
+const integer = (description, extra = {}) => ({ type: 'integer', description, ...extra });
 const branch = string('Target code branch.', { default: SCREEPS_BRANCH });
 const roomName = string('Screeps room name, e.g. W1N1.');
 
@@ -164,4 +165,30 @@ export const tools = [
   }),
   object('check_for_errors', 'Classify recent console errors.'),
   object('troubleshoot_bot', 'Run a compatibility diagnostic summary.'),
+  object(
+    'screeps_search',
+    'Search the Screeps documentation (game guide, API reference, and game constants). ' +
+      'Results are BM25-ranked sections with an id, title, breadcrumb, canonical URL, and snippet. ' +
+      'Follow up with screeps_read_section(id) for the full text.',
+    {
+      query: string(
+        'Keywords or identifier, e.g. "creep moveTo reusePath" or "TOWER_POWER_ATTACK".'
+      ),
+      limit: integer('Maximum number of results (1-25).', { minimum: 1, maximum: 25, default: 8 }),
+      scope: string('Search scope: "all", "api", or "guide".', { default: 'all' }),
+    },
+    ['query']
+  ),
+  object(
+    'screeps_read_section',
+    'Read the full text of one documentation section by id (returned from screeps_search).',
+    { id: integer('Section id returned from screeps_search.') },
+    ['id']
+  ),
+  object(
+    'screeps_read_page',
+    'Read the entire documentation page containing the given section id. Long pages are truncated.',
+    { id: integer('Any section id from the desired page.') },
+    ['id']
+  ),
 ];

@@ -18,6 +18,7 @@ import { errorResult, fail, HarnessError, ok } from '../core/result.js';
 import { validateToolArguments } from '../core/validation.js';
 import { getTelemetry } from '../telemetry.js';
 import { clearConsoleBuffer, getConsole } from './console.js';
+import { readPage, readSection, searchDocs } from './docs.js';
 import { executeConsoleCommand } from './execute-command.js';
 import { getGameTime } from './game-time.js';
 import { getMemory, setMemory } from './memory.js';
@@ -233,6 +234,9 @@ const handlers = {
   evaluate_health: evaluateHealth,
   check_for_errors: checkForErrors,
   troubleshoot_bot: troubleshootBot,
+  screeps_search: ({ query, limit = 8, scope = 'all' }) => ok(searchDocs(query, limit, scope)),
+  screeps_read_section: ({ id }) => ok(readSection(id)),
+  screeps_read_page: ({ id }) => ok(readPage(id)),
 };
 
 export async function dispatchTool(name, args = {}) {

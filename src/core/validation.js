@@ -63,6 +63,9 @@ export function validateToolArguments(name, args = {}) {
     get_room_terrain: ['roomName'],
     get_room_status: ['roomName'],
     get_room_objects: ['roomName'],
+    screeps_search: ['query'],
+    screeps_read_section: ['id'],
+    screeps_read_page: ['id'],
   }[name];
   for (const key of required || []) {
     if (!(key in args)) throw new HarnessError('invalid_request', `${key} is required.`);
@@ -127,6 +130,15 @@ export function validateToolArguments(name, args = {}) {
     } catch {
       throw new HarnessError('invalid_request', 'value must be valid JSON.');
     }
+  }
+  if ('query' in args) {
+    assertString(args.query, 'query', { min: 1, max: 256 });
+  }
+  if ('scope' in args && !['all', 'api', 'guide'].includes(args.scope)) {
+    throw new HarnessError('invalid_request', 'scope must be all, api, or guide.');
+  }
+  if ('id' in args && (!Number.isInteger(args.id) || args.id < 1)) {
+    throw new HarnessError('invalid_request', 'id must be a positive integer.');
   }
   return args;
 }

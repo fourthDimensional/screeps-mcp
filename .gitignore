@@ -40,6 +40,13 @@ build/
 # Local harness state (may contain operational history)
 .screeps-mcp/
 
+# Generated docs index (rebuild with npm run build:docs-index)
+data/screeps_docs.db
+
+# Docs source cache for index rebuild
+scripts/docs/screeps-docs/
+scripts/docs/constants.js
+
 # Local tool directories
 .claude/
 .cursor/

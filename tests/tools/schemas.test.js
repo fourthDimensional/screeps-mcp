@@ -36,6 +36,9 @@ describe('tool schemas', () => {
       get_room_terrain: ['roomName'],
       get_room_status: ['roomName'],
       get_room_objects: ['roomName'],
+      screeps_search: ['query'],
+      screeps_read_section: ['id'],
+      screeps_read_page: ['id'],
     };
 
     for (const [toolName, expectedRequired] of Object.entries(requiredParams)) {

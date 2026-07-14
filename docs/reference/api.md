@@ -94,6 +94,18 @@ This is now a compatibility alias for the tick-correlated `room_objects` probe. 
 
 Scans `get_console` logs for entries containing `error`, `exception`, or `undefined` (case-insensitive).
 
+## Documentation search
+
+These tools query the local SQLite FTS5 index built from the Screeps docs repo. The index must exist at `SCREEPS_DOCS_DB` (default `./data/screeps_docs.db`). Build or refresh it with `npm run build:docs-index`.
+
+| Tool | Purpose |
+| --- | --- |
+| `screeps_search` | BM25-ranked search over guide articles, API methods/properties, and constants. |
+| `screeps_read_section` | Read the full text of one section by the id returned from `screeps_search`. |
+| `screeps_read_page` | Read the entire page containing a section, truncated to ~24k characters. |
+
+All three tools are read-only.
+
 ## Known Limitations
 
 - **Console logs**: the Screeps HTTP GET endpoint returns 404. The MCP uses a WebSocket connection for real-time logs when `SCREEPS_TOKEN` is provided.

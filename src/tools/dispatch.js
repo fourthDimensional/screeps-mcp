@@ -160,8 +160,8 @@ const handlers = {
   deploy_files_and_verify: (args) =>
     deployFilesAndVerify({ ...args, upload: auditedDeploymentUpload }),
   get_console: async (args) => {
-    if (args.clearBuffer) await clearConsoleBuffer();
-    return getConsole(args);
+    const cleared = args.clearBuffer ? await clearConsoleBuffer() : null;
+    return { ...(await getConsole(args)), ...(cleared ? { cleared } : {}) };
   },
   execute_command: (args) =>
     mutation('raw_console', args, { console: true }, () =>

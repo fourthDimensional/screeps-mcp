@@ -33,9 +33,14 @@ export function pushResults(results) {
   }
 }
 
-export function getBuffer({ afterCursor = 0, limit = MAX_BUFFER_SIZE, levels } = {}) {
+export function getBuffer({ afterCursor = 0, beforeCursor = Infinity, limit = MAX_BUFFER_SIZE, levels } = {}) {
   const records = [...logsBuffer, ...resultsBuffer]
-    .filter((entry) => entry.cursor > afterCursor && (!levels || levels.includes(entry.severity)))
+    .filter(
+      (entry) =>
+        entry.cursor > afterCursor &&
+        entry.cursor <= beforeCursor &&
+        (!levels || levels.includes(entry.severity))
+    )
     .sort((left, right) => left.cursor - right.cursor)
     .slice(0, Math.min(limit, MAX_BUFFER_SIZE));
   return {

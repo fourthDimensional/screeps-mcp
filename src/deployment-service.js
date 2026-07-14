@@ -138,6 +138,7 @@ export async function deployManifestAndVerify({
   let observation;
   try {
     observation = await observeDistinctTicks({ deploymentId: record.id, verificationTicks });
+    await deploymentStore.update(record.id, { consoleEnd: captureConsoleCursor() });
     health = await evaluateHealth({
       deploymentId: record.id,
       baselineDeploymentId: baseline?.id,

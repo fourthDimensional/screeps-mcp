@@ -11,4 +11,21 @@ describe('probe expressions', () => {
     assert.match(expression, /probe-id/);
     assert.ok(expression.length < 1000, `probe expression is ${expression.length} characters`);
   });
+
+  it('generates detail-specific room snapshot payloads', () => {
+    const structures = createProbeExpression(
+      'room_snapshot',
+      { roomName: 'W1N1', detail: 'structures' },
+      'probe-id'
+    );
+    const creeps = createProbeExpression(
+      'room_snapshot',
+      { roomName: 'W1N1', detail: 'creeps' },
+      'probe-id'
+    );
+
+    assert.match(structures, /structureType/);
+    assert.match(creeps, /ticksToLive/);
+    assert.notEqual(structures, creeps);
+  });
 });

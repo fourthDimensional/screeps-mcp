@@ -101,12 +101,13 @@ export const tools = [
   ),
   object(
     'get_console',
-    'Read console records using cursors; raw console is an advanced observation.',
+    'Read console records using cursors or a deployment verification window; raw console is an advanced observation.',
     {
       afterCursor: { type: 'integer', minimum: 0, default: 0 },
       limit: { type: 'integer', minimum: 1, maximum: 200, default: 100 },
       levels: { type: 'array', items: { type: 'string' } },
       clearBuffer: { type: 'boolean', default: false },
+      deploymentId: string('Optional deployment ID; filters records to its captured cursor and tick window.'),
     }
   ),
   object(

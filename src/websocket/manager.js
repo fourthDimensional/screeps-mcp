@@ -3,6 +3,7 @@ import { clearBuffer, getBuffer, getLatestCursor, pushLogs, pushResults } from '
 
 let api = null;
 let connectionStatus = 'disconnected';
+let subscriptionStatus = 'unsubscribed';
 
 function parseServerUrl(server) {
   const serverUrl = new URL(server);
@@ -18,7 +19,7 @@ function parseServerUrl(server) {
 }
 
 export async function initWebSocket(token, server = 'http://localhost:21025') {
-  if (api && connectionStatus === 'connected') {
+  if (api && connectionStatus === 'connected' && subscriptionStatus === 'subscribed') {
     console.error('WebSocket already connected');
     return api;
   }
@@ -36,9 +37,7 @@ export async function initWebSocket(token, server = 'http://localhost:21025') {
 
     console.error('Connecting to Screeps WebSocket...');
     await api.socket.connect();
-    connectionStatus = 'connected';
-
-    api.socket.subscribe('console', (event) => {
+    await api.socket.subscribe('console', (event) => {
       try {
         const { messages } = event.data;
         if (messages) {
@@ -49,15 +48,19 @@ export async function initWebSocket(token, server = 'http://localhost:21025') {
         console.error('Error processing console message:', error);
       }
     });
+    connectionStatus = 'connected';
+    subscriptionStatus = 'subscribed';
 
     api.socket.on('error', (error) => {
       console.error('WebSocket error:', error);
       connectionStatus = 'error';
+      subscriptionStatus = 'error';
     });
 
     api.socket.on('close', () => {
       console.error('WebSocket connection closed');
       connectionStatus = 'disconnected';
+      subscriptionStatus = 'unsubscribed';
     });
 
     console.error('✅ WebSocket connected to Screeps successfully');
@@ -65,6 +68,7 @@ export async function initWebSocket(token, server = 'http://localhost:21025') {
   } catch (error) {
     console.error('❌ Failed to initialize WebSocket:', error.message);
     connectionStatus = 'error';
+    subscriptionStatus = 'error';
     throw error;
   }
 }
@@ -74,6 +78,7 @@ export async function closeWebSocket() {
     try {
       await api.socket.disconnect();
       connectionStatus = 'disconnected';
+      subscriptionStatus = 'unsubscribed';
       console.error('WebSocket disconnected');
     } catch (error) {
       console.error('Error disconnecting WebSocket:', error);
@@ -83,7 +88,7 @@ export async function closeWebSocket() {
 }
 
 export async function ensureConnection(token, server) {
-  if (connectionStatus !== 'connected') {
+  if (connectionStatus !== 'connected' || subscriptionStatus !== 'subscribed') {
     console.error('Reconnecting WebSocket...');
     await initWebSocket(token, server);
   }
@@ -94,6 +99,8 @@ export function getConnectionStatus() {
   return {
     status: connectionStatus,
     connected: connectionStatus === 'connected',
+    subscribed: subscriptionStatus === 'subscribed',
+    subscriptionStatus,
     bufferSize: getBuffer().count,
   };
 }

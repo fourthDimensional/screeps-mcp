@@ -3,7 +3,13 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['node_modules/**', 'dist/**', 'build/**', 'coverage/**'],
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'coverage/**',
+      'scripts/docs/screeps-docs/**',
+    ],
   },
   js.configs.recommended,
   {

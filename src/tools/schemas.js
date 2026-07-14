@@ -34,10 +34,29 @@ export const tools = [
     ['manifest']
   ),
   object(
+    'validate_files',
+    'Build and validate a complete module manifest from a local JavaScript file or directory. Source must be under SCREEPS_SOURCE_ROOT. Safety: read-only.',
+    {
+      sourcePath: string('Local JavaScript file or source directory.'),
+      entryModule: string('Optional entry module; defaults to main for a directory.'),
+    },
+    ['sourcePath']
+  ),
+  object(
     'upload_modules',
     'Upload a validated, complete module manifest. Safety: code write.',
     { manifest: { type: 'object' }, branch },
     ['manifest']
+  ),
+  object(
+    'upload_files',
+    'Build and upload all JavaScript modules from a local file or directory. Source must be under SCREEPS_SOURCE_ROOT. Safety: code write.',
+    {
+      sourcePath: string('Local JavaScript file or source directory.'),
+      branch,
+      entryModule: string('Optional entry module; defaults to main for a directory.'),
+    },
+    ['sourcePath']
   ),
   object(
     'upload_code',

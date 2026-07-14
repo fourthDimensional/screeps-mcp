@@ -9,7 +9,9 @@ import {
   getCodeModules,
   listBranches,
   listCodeModules,
+  uploadFiles,
   uploadModules,
+  validateFiles,
   validateManifest,
 } from '../modules.js';
 import { checkPolicy, policyForEnvironment } from '../policy.js';
@@ -189,9 +191,29 @@ const handlers = {
       ? ok(validation, 'Module manifest is valid.')
       : fail('validation_failed', 'Module manifest is invalid.', validation.errors);
   },
+  validate_files: async ({ sourcePath, entryModule }) => {
+    const result = await validateFiles(sourcePath, { entryModule });
+    return result.validation.valid
+      ? ok(
+          {
+            sourcePath: result.sourcePath,
+            moduleCount: result.moduleCount,
+            ...result.validation,
+          },
+          'Source files produce a valid module manifest.'
+        )
+      : fail('validation_failed', 'Source files produce an invalid module manifest.', {
+          sourcePath: result.sourcePath,
+          ...result.validation,
+        });
+  },
   upload_modules: ({ manifest, branch = SCREEPS_BRANCH }) =>
     mutation('code_upload', { manifest, branch }, { branch }, () =>
       uploadModules(manifest, branch)
+    ),
+  upload_files: ({ sourcePath, branch = SCREEPS_BRANCH, entryModule }) =>
+    mutation('code_upload', { sourcePath, branch, entryModule }, { branch, sourcePath }, () =>
+      uploadFiles(sourcePath, branch, { entryModule })
     ),
   upload_code: (args) =>
     mutation('code_upload', args, { branch: args.branch || SCREEPS_BRANCH }, () =>

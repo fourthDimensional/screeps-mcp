@@ -24,6 +24,7 @@ const SCREEPS_SESSION_LABEL = process.env.SCREEPS_SESSION_LABEL || 'mcp';
 const SCREEPS_DOCS_DB = process.env.SCREEPS_DOCS_DB
   ? path.resolve(projectRoot, process.env.SCREEPS_DOCS_DB)
   : path.join(projectRoot, 'data', 'screeps_docs.db');
+const SCREEPS_SOURCE_ROOT = path.resolve(process.env.SCREEPS_SOURCE_ROOT || process.cwd());
 
 if (!['development', 'staging', 'production'].includes(SCREEPS_ENVIRONMENT)) {
   throw new Error('SCREEPS_ENVIRONMENT must be development, staging, or production.');
@@ -83,4 +84,5 @@ export {
   SCREEPS_METRICS_PATH,
   SCREEPS_SESSION_LABEL,
   SCREEPS_DOCS_DB,
+  SCREEPS_SOURCE_ROOT,
 };

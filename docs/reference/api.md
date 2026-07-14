@@ -59,7 +59,7 @@ All tools return `{ ok, code, message, data }`; see [Tool Results](tool-results.
 | Observation | `get_console`, `run_probe`, `get_empire_snapshot`, `get_room_snapshot` | Cursor records or tick-correlated structured snapshots with freshness. |
 | Evidence | `get_telemetry`, `record_snapshot`, `get_metrics`, `compare_deployments`, `evaluate_health` | Optional telemetry, local samples, summary statistics, and a three-state verdict. |
 
-`upload_modules`, `activate_branch`, `rollback_deployment`, raw `execute_command`, and `set_memory` are audited mutations. In production they require the matching value in `SCREEPS_APPROVED_OPERATIONS`. Console records cap reads at 200; HTTP responses cap at 1 MiB; idempotent reads retry once.
+`validate_files` and `upload_files` build a complete manifest from a JavaScript file or a directory tree. Directory files become module names relative to that directory (`roles/harvester.js` becomes `roles/harvester`); `main.js` is the default entry module. Both tools only read under `SCREEPS_SOURCE_ROOT` (the process working directory unless configured). `upload_files`, `upload_modules`, `activate_branch`, `rollback_deployment`, raw `execute_command`, and `set_memory` are audited mutations. In production they require the matching value in `SCREEPS_APPROVED_OPERATIONS`. Console records cap reads at 200; HTTP responses cap at 1 MiB; idempotent reads retry once.
 
 ## Compatibility tools
 

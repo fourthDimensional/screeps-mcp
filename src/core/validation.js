@@ -50,6 +50,8 @@ export function validateToolArguments(name, args = {}) {
   assertObject(args);
   const required = {
     upload_modules: ['manifest'],
+    validate_files: ['sourcePath'],
+    upload_files: ['sourcePath'],
     validate_modules: ['manifest'],
     get_code_modules: ['branch'],
     list_code_modules: ['branch'],
@@ -75,6 +77,8 @@ export function validateToolArguments(name, args = {}) {
   if ('branch' in args) validateBranch(args.branch);
   if ('path' in args) validatePath(args.path);
   if ('mainJsPath' in args) assertString(args.mainJsPath, 'mainJsPath', { max: 4096 });
+  if ('sourcePath' in args) assertString(args.sourcePath, 'sourcePath', { max: 4096 });
+  if ('entryModule' in args) validateModuleName(args.entryModule);
   if ('command' in args) assertString(args.command, 'command', { max: 10000 });
   if ('deploymentId' in args)
     assertString(args.deploymentId, 'deploymentId', { max: 128, pattern: /^[A-Za-z0-9-]+$/ });

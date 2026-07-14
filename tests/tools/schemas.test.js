@@ -7,7 +7,9 @@ const REQUIRED_HARNESS_TOOLS = [
   'get_policy',
   'get_audit_log',
   'validate_modules',
+  'validate_files',
   'upload_modules',
+  'upload_files',
   'deploy_and_verify',
   'rollback_deployment',
   'run_probe',
@@ -31,6 +33,8 @@ describe('tool schemas', () => {
   it('marks required parameters on tools that need them', () => {
     const requiredParams = {
       upload_code: ['mainJsPath'],
+      validate_files: ['sourcePath'],
+      upload_files: ['sourcePath'],
       execute_command: ['command'],
       set_memory: ['path', 'value'],
       get_room_terrain: ['roomName'],

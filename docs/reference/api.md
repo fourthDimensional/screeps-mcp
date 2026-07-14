@@ -47,7 +47,7 @@ The default targets a local private server. Set `SCREEPS_SERVER` to override it,
 
 ## Harness tools
 
-All tools return `{ ok, code, message, data }`; see [Tool Results](tool-results.md). `upload_modules` accepts a complete manifest with `entryModule`, `modules`, and an optional content hash. `deploy_and_verify` persists a deployment record before upload, captures an observation, and returns `healthy`, `unhealthy`, or `inconclusive` verification without activating a branch.
+All tools return `{ ok, code, message, data }`; see [Tool Results](tool-results.md). `upload_modules` accepts a complete manifest with `entryModule`, `modules`, and an optional content hash. `deploy_and_verify` accepts that manifest, while `deploy_files_and_verify` builds it from a local JavaScript file or directory. Both persist a deployment record, read the target branch back to verify the module hash, capture a distinct-tick observation window, and never activate a branch implicitly.
 
 `run_probe`, `get_empire_snapshot`, and `get_room_snapshot` wait for a correlated console result. A successful `POST /api/user/console` acknowledgement only proves that a command was issued; it is never treated as live game data.
 
@@ -55,11 +55,11 @@ All tools return `{ ok, code, message, data }`; see [Tool Results](tool-results.
 | --- | --- | --- |
 | Policy and audit | `get_policy`, `get_audit_log` | Effective permissions and redacted append-only events. |
 | Deployment records | `get_deployment`, `list_deployments`, `rollback_deployment` | Branch, shard, hashes, baseline, ticks, status, and verification. |
-| Code lifecycle | `list_branches`, `list_code_modules`, `get_code_modules`, `validate_modules`, `upload_modules`, `activate_branch`, `deploy_and_verify` | Complete manifests, validation errors, and remote payload under `rawServerData`. |
+| Code lifecycle | `list_branches`, `list_code_modules`, `get_code_modules`, `validate_modules`, `validate_files`, `upload_modules`, `upload_files`, `activate_branch`, `deploy_and_verify`, `deploy_files_and_verify` | Complete manifests, validation errors, and remote payload under `rawServerData`. |
 | Observation | `get_console`, `run_probe`, `get_empire_snapshot`, `get_room_snapshot` | Cursor records or tick-correlated structured snapshots with freshness. |
 | Evidence | `get_telemetry`, `record_snapshot`, `get_metrics`, `compare_deployments`, `evaluate_health` | Optional telemetry, local samples, summary statistics, and a three-state verdict. |
 
-`validate_files` and `upload_files` build a complete manifest from a JavaScript file or a directory tree. Directory files become module names relative to that directory (`roles/harvester.js` becomes `roles/harvester`); `main.js` is the default entry module. Both tools only read under `SCREEPS_SOURCE_ROOT` (the process working directory unless configured). `upload_files`, `upload_modules`, `activate_branch`, `rollback_deployment`, raw `execute_command`, and `set_memory` are audited mutations. In production they require the matching value in `SCREEPS_APPROVED_OPERATIONS`. Console records cap reads at 200; HTTP responses cap at 1 MiB; idempotent reads retry once.
+`validate_files`, `upload_files`, and `deploy_files_and_verify` build a complete manifest from a JavaScript file or a directory tree. Directory files become module names relative to that directory (`roles/harvester.js` becomes `roles/harvester`); `main.js` is the default entry module. All file tools only read under `SCREEPS_SOURCE_ROOT` (the process working directory unless configured). A verified deployment records its source path, module count, readback hash evidence, and distinct observed ticks. `upload_files`, `upload_modules`, `deploy_files_and_verify`, `activate_branch`, `rollback_deployment`, raw `execute_command`, and `set_memory` are audited mutations. In production they require the matching value in `SCREEPS_APPROVED_OPERATIONS`. Console records cap reads at 200; HTTP responses cap at 1 MiB; idempotent reads retry once.
 
 ## Compatibility tools
 

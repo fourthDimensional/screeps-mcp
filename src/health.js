@@ -4,7 +4,38 @@ import { metricsStore } from './metrics.js';
 import { ok } from './core/result.js';
 import { classifyErrors } from './errors.js';
 
-export async function evaluateHealth({ deploymentId, baselineDeploymentId } = {}) {
+export function consoleEntriesForHealth(consoleData, { afterCursor, consoleCursorAvailable } = {}) {
+  const cursorRequested = consoleCursorAvailable !== undefined;
+  if (consoleCursorAvailable) {
+    if (consoleData.source !== 'websocket') {
+      return {
+        entries: [],
+        confidence: 'unavailable',
+        reason: 'Post-deployment console filtering requires a live WebSocket cursor window.',
+      };
+    }
+    const records = consoleData.records || [];
+    return {
+      entries: records.filter((record) => record.cursor > afterCursor),
+      confidence: 'post_deployment',
+    };
+  }
+  if (cursorRequested) {
+    return {
+      entries: [],
+      confidence: 'unavailable',
+      reason: 'Post-deployment console filtering requires WebSocket cursors.',
+    };
+  }
+  return { entries: consoleData.logs || [], confidence: 'unbounded' };
+}
+
+export async function evaluateHealth({
+  deploymentId,
+  baselineDeploymentId,
+  afterCursor,
+  consoleCursorAvailable,
+} = {}) {
   const evidence = [];
   let snapshot;
   try {
@@ -13,9 +44,15 @@ export async function evaluateHealth({ deploymentId, baselineDeploymentId } = {}
   } catch (error) {
     evidence.push({ check: 'probe', state: 'unavailable', code: error.code || 'error' });
   }
-  const consoleData = await getConsole({ limit: 100 });
-  const logs = consoleData.data?.logs || consoleData.logs || [];
-  const errorGroups = classifyErrors(logs, {
+  const consoleData = await getConsole({
+    limit: 100,
+    ...(consoleCursorAvailable ? { afterCursor } : {}),
+  });
+  const consoleEvidence = consoleEntriesForHealth(consoleData, {
+    afterCursor,
+    consoleCursorAvailable,
+  });
+  const errorGroups = classifyErrors(consoleEvidence.entries, {
     deploymentId,
     tick: snapshot?.data?.result?.tick,
   });
@@ -24,6 +61,11 @@ export async function evaluateHealth({ deploymentId, baselineDeploymentId } = {}
     check: 'fatal_errors',
     count: fatalErrors.reduce((count, error) => count + error.count, 0),
     fingerprints: fatalErrors.map((error) => error.fingerprint),
+  });
+  evidence.push({
+    check: 'console_window',
+    state: consoleEvidence.confidence,
+    ...(consoleEvidence.reason ? { reason: consoleEvidence.reason } : {}),
   });
   const comparison =
     deploymentId && baselineDeploymentId

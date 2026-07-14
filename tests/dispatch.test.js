@@ -25,4 +25,10 @@ describe('tool dispatch validation', () => {
     assert.equal(result.ok, false);
     assert.equal(result.code, 'invalid_request');
   });
+
+  it('requires a source path for file-native verified deployments', async () => {
+    const result = await dispatchTool('deploy_files_and_verify', {});
+    assert.equal(result.ok, false);
+    assert.equal(result.code, 'invalid_request');
+  });
 });

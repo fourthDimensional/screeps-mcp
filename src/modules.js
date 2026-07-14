@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import vm from 'node:vm';
 import { SCREEPS_BRANCH, SCREEPS_SOURCE_ROOT } from './config.js';
-import { HarnessError, ok } from './core/result.js';
+import { fail, HarnessError, ok } from './core/result.js';
 import { validateBranch, validateModuleName } from './core/validation.js';
 import { transport } from './transport/screeps-transport.js';
 
@@ -109,6 +109,24 @@ export function hashModules(modules) {
   return `sha256:${createHash('sha256').update(JSON.stringify(normalized)).digest('hex')}`;
 }
 
+/**
+ * Compare a complete module manifest with the modules read back from Screeps.
+ * A successful upload acknowledgement alone does not prove the remote branch
+ * now contains the requested source.
+ */
+export function verifyRemoteModules(manifest, remoteModules) {
+  const expectedModules = manifest.modules;
+  const expectedSourceHash = hashModules(expectedModules);
+  const actualSourceHash = hashModules(remoteModules || {});
+  return {
+    state: expectedSourceHash === actualSourceHash ? 'verified' : 'mismatch',
+    expectedSourceHash,
+    actualSourceHash,
+    expectedModuleCount: Object.keys(expectedModules).length,
+    actualModuleCount: Object.keys(remoteModules || {}).length,
+  };
+}
+
 export function validateManifest(manifest) {
   const errors = [];
   if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest))
@@ -199,9 +217,14 @@ export async function uploadModules(manifest, branch = SCREEPS_BRANCH) {
       validation.errors
     );
   const response = await transport.post('/api/user/code', { branch, modules: manifest.modules });
+  if (response.data?.ok === false)
+    return fail('upload_rejected', 'Screeps rejected the module upload.', {
+      branch,
+      rawServerData: response.data,
+    });
   return ok(
     { branch, sourceHash: validation.sourceHash, rawServerData: response.data },
-    response.data?.ok === false ? 'Screeps rejected the upload.' : 'Modules uploaded.'
+    'Modules uploaded.'
   );
 }
 
@@ -213,6 +236,7 @@ export async function validateFiles(sourcePath, options) {
 export async function uploadFiles(sourcePath, branch = SCREEPS_BRANCH, options) {
   const loaded = await loadManifestFromFiles(sourcePath, options);
   const uploaded = await uploadModules(loaded.manifest, branch);
+  if (!uploaded.ok) return uploaded;
   return ok({ ...uploaded.data, sourcePath: loaded.sourcePath, moduleCount: loaded.moduleCount });
 }
 export async function activateBranch(branch) {

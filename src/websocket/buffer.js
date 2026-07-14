@@ -58,3 +58,7 @@ export function clearBuffer() {
 export function getSize() {
   return logsBuffer.length;
 }
+
+export function getLatestCursor() {
+  return sequence;
+}

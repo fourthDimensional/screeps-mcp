@@ -88,6 +88,18 @@ export const tools = [
     ['manifest']
   ),
   object(
+    'deploy_files_and_verify',
+    'Build, validate, upload, read back, record, and observe all JavaScript modules from a local file or directory without sending source contents through MCP. Safety: code write.',
+    {
+      sourcePath: string('Local JavaScript file or source directory.'),
+      entryModule: string('Optional entry module; defaults to main for a directory.'),
+      branch,
+      shard: string('Target shard.', { default: SCREEPS_SHARD }),
+      verificationTicks: { type: 'integer', minimum: 1, maximum: 30, default: 5 },
+    },
+    ['sourcePath']
+  ),
+  object(
     'get_console',
     'Read console records using cursors; raw console is an advanced observation.',
     {

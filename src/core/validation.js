@@ -52,6 +52,7 @@ export function validateToolArguments(name, args = {}) {
     upload_modules: ['manifest'],
     validate_files: ['sourcePath'],
     upload_files: ['sourcePath'],
+    deploy_files_and_verify: ['sourcePath'],
     validate_modules: ['manifest'],
     get_code_modules: ['branch'],
     list_code_modules: ['branch'],

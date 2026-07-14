@@ -1,5 +1,5 @@
 import { transport } from '../transport/screeps-transport.js';
-import { getBuffer, getConnectionStatus } from '../websocket/index.js';
+import { getBuffer, getConnectionStatus, getLatestCursor } from '../websocket/index.js';
 
 let wsInitialized = false;
 
@@ -11,11 +11,23 @@ export function isWebSocketInitialized() {
   return wsInitialized;
 }
 
+export function consoleCursorForState({ initialized, connected, cursor }) {
+  return initialized && connected ? cursor : null;
+}
+
+export function getConsoleCursor() {
+  return consoleCursorForState({
+    initialized: wsInitialized,
+    connected: getConnectionStatus().connected,
+    cursor: getLatestCursor(),
+  });
+}
+
 export async function getConsole({ afterCursor = 0, limit = 100, levels } = {}) {
-  if (wsInitialized) {
+  const connectionStatus = getConnectionStatus();
+  if (wsInitialized && connectionStatus.connected) {
     try {
       const buffer = getBuffer({ afterCursor, limit, levels });
-      const status = getConnectionStatus();
 
       return {
         logs: buffer.logs,
@@ -26,7 +38,7 @@ export async function getConsole({ afterCursor = 0, limit = 100, levels } = {}) 
         error: null,
         available: true,
         source: 'websocket',
-        connectionStatus: status.status,
+        connectionStatus: connectionStatus.status,
         note: 'Real-time console logs via WebSocket',
       };
     } catch (error) {

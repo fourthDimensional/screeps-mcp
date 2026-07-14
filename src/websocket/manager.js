@@ -1,5 +1,5 @@
 import { ScreepsAPI } from 'screeps-api';
-import { clearBuffer, getBuffer, pushLogs, pushResults } from './buffer.js';
+import { clearBuffer, getBuffer, getLatestCursor, pushLogs, pushResults } from './buffer.js';
 
 let api = null;
 let connectionStatus = 'disconnected';
@@ -98,4 +98,4 @@ export function getConnectionStatus() {
   };
 }
 
-export { clearBuffer, getBuffer };
+export { clearBuffer, getBuffer, getLatestCursor };

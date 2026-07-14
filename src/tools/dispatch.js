@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import { SCREEPS_BRANCH, SCREEPS_SHARD } from '../config.js';
 import { auditStore } from '../audit.js';
 import { deploymentStore } from '../deployments.js';
+import { deployFilesAndVerify, deployManifestAndVerify } from '../deployment-service.js';
 import { evaluateHealth } from '../health.js';
 import { compareDeployments, getMetrics, metricsStore } from '../metrics.js';
 import {
@@ -70,78 +71,10 @@ function parseMemoryValue(value) {
   }
 }
 
-async function deployAndVerify({
-  manifest,
-  branch = SCREEPS_BRANCH,
-  shard = SCREEPS_SHARD,
-  verificationTicks = 5,
-}) {
-  const validation = validateManifest(manifest);
-  if (!validation.valid)
-    return fail(
-      'validation_failed',
-      'Module manifest failed validation; no deployment was started.',
-      validation.errors
-    );
-  const baseline = await deploymentStore.latestKnownGood({ branch, shard });
-  let requestedTick = null;
-  try {
-    requestedTick = (await getGameTime(shard)).tick ?? null;
-  } catch {
-    // A configured server may not expose game time; the deployment remains traceable by wall clock.
-  }
-  const record = await deploymentStore.create({
-    sourceHash: validation.sourceHash,
-    branch,
-    shard,
-    baselineId: baseline?.id || null,
-    rollbackTarget: baseline?.branch && baseline.branch !== branch ? baseline.branch : null,
-    requestedTick,
-    verificationWindowTicks: verificationTicks,
-    status: 'uploading',
+function auditedDeploymentUpload({ manifest, branch, request, deploymentId }) {
+  return mutation('code_upload', request, { branch }, () => uploadModules(manifest, branch), {
+    deploymentId,
   });
-  const upload = await mutation(
-    'code_upload',
-    { manifest, branch },
-    { branch, shard },
-    () => uploadModules({ ...manifest, sourceHash: validation.sourceHash }, branch),
-    { deploymentId: record.id }
-  );
-  if (!upload.ok) {
-    await deploymentStore.update(record.id, { status: 'failed', failure: upload });
-    return upload;
-  }
-  let health;
-  try {
-    const observedTicks = [];
-    for (let index = 0; index < verificationTicks; index += 1) {
-      const snapshot = await getEmpireSnapshot();
-      const metric = await metricsStore.record({ ...snapshot.data, deploymentId: record.id });
-      observedTicks.push(metric.tick);
-      if (index + 1 < verificationTicks) await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-    health = await evaluateHealth({ deploymentId: record.id, baselineDeploymentId: baseline?.id });
-    health.data.observedTicks = observedTicks;
-  } catch (error) {
-    health = errorResult(error);
-  }
-  const status =
-    health.ok && health.data.verdict === 'healthy'
-      ? 'healthy'
-      : health.ok
-        ? 'inconclusive'
-        : 'failed';
-  const completed = await deploymentStore.update(record.id, {
-    status,
-    completionTick: health.data?.evidence?.find((item) => item.check === 'probe')?.tick,
-    verification: health,
-  });
-  return ok(
-    { deployment: completed, upload: upload.data, verification: health.data },
-    status === 'healthy'
-      ? 'Deployment verified healthy.'
-      : 'Deployment uploaded; verification is not conclusive.'
-  );
 }
 
 async function rollbackDeployment({ deploymentId }) {
@@ -222,7 +155,10 @@ const handlers = {
   activate_branch: ({ branch }) =>
     mutation('branch_activation', { branch }, { branch }, () => activateBranch(branch)),
   rollback_deployment: rollbackDeployment,
-  deploy_and_verify: deployAndVerify,
+  deploy_and_verify: (args) =>
+    deployManifestAndVerify({ ...args, upload: auditedDeploymentUpload }),
+  deploy_files_and_verify: (args) =>
+    deployFilesAndVerify({ ...args, upload: auditedDeploymentUpload }),
   get_console: async (args) => {
     if (args.clearBuffer) await clearConsoleBuffer();
     return getConsole(args);

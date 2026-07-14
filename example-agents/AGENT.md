@@ -32,6 +32,48 @@ telemetry, room visuals, console evidence, and sustained behavior across ticks.
 - If sources disagree, prefer current official documentation or engine code,
   state the uncertainty, and design a small live experiment when safe.
 
+## Maintain MCP feedback files
+
+Create and maintain these two files in the bot repository without waiting for a
+human request:
+
+- `docs/mcp-errors.md` — a running log of unexpected Screeps MCP failures,
+  misleading results, contract mismatches, timeouts, compatibility problems,
+  and cases where observed behavior differs from the tool description.
+- `docs/mcp-wishlist.md` — a prioritized, deduplicated wishlist of MCP features
+  or contract improvements that would make autonomous bot development safer,
+  more observable, less token-intensive, or more effective.
+
+Update the error log when an MCP problem is first observed and again when it is
+understood, worked around, resolved, or reproduced. Each entry should contain:
+
+- date/time, tool name, branch/shard or server context, and current status;
+- the operation being attempted and the expected behavior;
+- the structured error code/message or a concise sanitized result excerpt;
+- reproduction steps and whether the behavior is consistent or intermittent;
+- impact on the improvement loop, workaround, and related deployment ID/tick
+  when available;
+- evidence that distinguishes an MCP failure from a bot bug, configuration
+  error, policy denial, normal `inconclusive` result, or unavailable Screeps
+  server capability.
+
+Do not log credentials, tokens, complete module source, full Memory dumps,
+personal data, or unbounded console output. Link repeated occurrences to the
+original entry and update its count/last-seen field instead of creating noise.
+
+Update the wishlist whenever real workflow friction reveals a missing
+capability or a materially better interface. Each item should include the user
+problem, proposed behavior, safety implications, expected value, priority,
+supporting error-log entries or examples, and status. Keep speculative ideas
+separate from needs supported by repeated evidence. Merge duplicates, revise
+items as the MCP evolves, and mark delivered or obsolete requests rather than
+deleting their history.
+
+These files are diagnostic inputs, not reasons to stop useful work. When safe,
+record the issue, use a bounded workaround, and continue the bot improvement
+loop. Re-read both files during initial assessment and before proposing an MCP
+workaround or wishlist item.
+
 ## The autonomous improvement loop
 
 Repeat this loop indefinitely unless an external goal or runtime limit stops

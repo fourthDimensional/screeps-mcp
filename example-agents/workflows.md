@@ -1,18 +1,28 @@
 # Screeps agent workflows
 
-This guide accompanies the captured long-running agent session in this directory.
-It turns its deployment and diagnosis lessons into a bounded, evidence-driven
-workflow.
+Keep this file with the bot source it describes. It assumes an agent has access
+to a configured `screeps-mcp` server; it does not depend on any other file in
+the MCP server repository.
+
+## Before starting
+
+- Configure the MCP server with Screeps credentials, the intended default
+  branch and shard, and `SCREEPS_SOURCE_ROOT` set to this bot's source root.
+- Keep the bot entry point at `main.js`, or pass `entryModule` explicitly.
+  JavaScript files under the selected source directory become Screeps modules
+  relative to that directory (`roles/harvester.js` becomes `roles/harvester`).
+- Use an explicit branch in every deployment request. Activation is separate
+  and may require approval under the server policy.
 
 ## Deploying a modular bot
 
 1. Inspect deliberately: call `get_policy`, `list_branches`,
    `get_empire_snapshot`, and `get_telemetry`. Name the branch explicitly;
    do not infer an active branch.
-2. Change the bot in its local source directory, then run `validate_files` on
-   that directory. This builds the complete module manifest without placing a
-   network write.
-3. Run `deploy_files_and_verify` with the same directory, intended branch,
+2. Change the bot locally, then run `validate_files` with `sourcePath: "."`
+   (or the bot's source subdirectory). This builds the complete module
+   manifest without placing a network write.
+3. Run `deploy_files_and_verify` with the same `sourcePath`, intended branch,
    and a bounded `verificationTicks` window. It reads the files locally, then
    validates, uploads, reads the remote branch back, records the deployment,
    and observes distinct Screeps ticks. Source text stays local instead of
@@ -47,6 +57,11 @@ manifest. Use the file-native tool for normal local bot work.
   a deployment; HTTP-only console history cannot, so that limitation is
   reported explicitly.
 
-For the full closed-loop safety model, see the [agent playbook](../docs/agent-playbook.md),
-[API reference](../docs/reference/api.md), and
-[telemetry contract](../docs/reference/telemetry-contract.md).
+## Tool assumptions
+
+This workflow uses these MCP tools: `get_policy`, `list_branches`,
+`get_empire_snapshot`, `get_telemetry`, `validate_files`,
+`deploy_files_and_verify`, `get_deployment`, `get_metrics`,
+`compare_deployments`, and `rollback_deployment`. If a configured server does
+not provide telemetry or WebSocket console logs, continue with the available
+snapshot evidence and regard health results as lower-confidence when indicated.
